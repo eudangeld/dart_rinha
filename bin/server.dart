@@ -16,20 +16,20 @@ void main() async {
   final pessoasController = PessoasController(pessoasService);
 
   final router = Router();
-  router.get('/pessoas/<id>', (Request request, String id) {
-    return pessoasController.find(id);
+  router.get('/pessoas/<id>',
+      (Request request, String id) => pessoasController.find(id));
+
+  router.get('/pessoas', (Request request) async {
+    final resp = await pessoasController.filter(request);
+
+    return resp;
   });
-  router.get('/pessoas', (Request request) {
-    final qParams = request.url.queryParameters;
-    return Response.ok('procura pessoa with term: $qParams');
-  });
-  router.get('/contagem-pessoas', (Request request) async {
-    return await pessoasController.count();
-  });
-  router.post('/pessoas/', (Request request) async {
-    final body = await request.readAsString();
-    return pessoasController.create(body);
-  });
+
+  router.get(
+      '/contagem-pessoas', (Request request) => pessoasController.count());
+
+  router.post(
+      '/pessoas/', (Request request) => pessoasController.create(request));
 
   var server = await shelf_io.serve(router, 'localhost', 8080);
   server.autoCompress = true;

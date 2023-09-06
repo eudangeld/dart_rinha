@@ -1,8 +1,5 @@
-import 'dart:convert';
-
-import '../../mysql_lib/mysql_client.dart';
-
 import '../../domain/enitite/pessoa.entity.dart';
+import '../../mysql_lib/mysql_client.dart';
 import '../../uuid/uuid.dart';
 
 class PessoasSevice {
@@ -13,19 +10,11 @@ class PessoasSevice {
   final uuid = Uuid();
 
   Future<Pessoa> find(String id) async {
-    // final query = '''
-    //       SELECT nome, apelido, nascimento, stack FROM pessoas WHERE :id
-    //         ''';
-
     final query = '''
-        SELECT  (id, nome, apelido,stack, nascimento) 
-        FROM pessoas
-        WHERE (`:serchable` LIKE')
-          ''';
+          SELECT nome, apelido, nascimento, stack FROM pessoas WHERE id = :id
+            ''';
 
-    final res = await connection.execute(query, {'serchable': 'jose'});
-
-    // final res = await connection.execute(query, {'id': id});
+    final res = await connection.execute(query, {"id": id});
 
     if (res.numOfRows > 0) {
       final userData = res.rows.first.assoc();
@@ -63,15 +52,31 @@ class PessoasSevice {
   }
 
   Future<List> filter(String term) async {
+    List<Pessoa> response = [];
+
     final query = '''
-        SELECT  (id, nome, apelido,stack, nascimento) 
+        SELECT nome, nascimento, stack, apelido
         FROM pessoas
-        WHERE (`:serchable` LIKE')
+        WHERE serchable LIKE :serchable
           ''';
+    final res = await connection.execute(query, {"serchable": "%$term%"});
 
-    connection.execute(query, {'serchable': term});
+    if (res.numOfRows > 0) {
+      for (final pessoa in res.rows) {
+        final data = pessoa.assoc();
+        response.add(Pessoa(
+          nome: data['nome']!,
+          apelido: data['apelido']!,
+          nascimento: data['nascimento']!,
+          stack: [],
+        ));
+      }
+    }
 
-    return [];
+    print('response.length');
+    print(response.length);
+
+    return response;
   }
 }
 
