@@ -16,6 +16,7 @@ void main() async {
   final pessoasController = PessoasController(pessoasService);
 
   final router = Router();
+  router.get('/health', (Request request) => Response.ok('dar done'));
   router.get('/pessoas/<id>',
       (Request request, String id) => pessoasController.find(id));
 
