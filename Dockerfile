@@ -1,17 +1,16 @@
-# Use latest stable channel SDK.
-# FROM dart:stable AS build
-FROM dart:latest
+FROM dart:stable as build
+COPY . /dart-server
 
-
-WORKDIR /app
 COPY pubspec.* .
-RUN  dart pub get
-COPY . .
-RUN  dart pub get --offline
-RUN  dart compile exe bin/server.dart
-FROM subfuzion/dart-scratch
-COPY --from=0 /app/bin/server.exe /app/bin/server.exe
+
+WORKDIR /dart-server
+
+RUN mkdir build
+RUN dart pub get
+RUN dart compile exe ./bin/server.dart -o ./build/dartserver
 
 
-EXPOSE 8080
-CMD ["/app/bin/server.exe"]
+FROM scratch
+COPY --from=build /runtime/ /
+COPY --from=build /dart-server/build/dartserver /app/bin/
+CMD ["/app/bin/dartserver"]
