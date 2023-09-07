@@ -1,5 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'dart:io';
+
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
@@ -10,13 +12,11 @@ import 'router_lib/src/router.dart';
 
 void main() async {
   final db = await database();
-  await db.connect();
-
   final pessoasService = PessoasSevice(db);
   final pessoasController = PessoasController(pessoasService);
 
   final router = Router();
-  router.get('/health', (Request request) => Response.ok('dar done'));
+  router.get('/health', (Request request) => Response.ok('done'));
   router.get('/pessoas/<id>',
       (Request request, String id) => pessoasController.find(id));
 
@@ -32,7 +32,7 @@ void main() async {
   router.post(
       '/pessoas/', (Request request) => pessoasController.create(request));
 
-  var server = await shelf_io.serve(router, 'localhost', 8080);
+  var server = await shelf_io.serve(router, InternetAddress.anyIPv4, 8080);
   server.autoCompress = true;
 
   print('Serving at http://${server.address.host}:${server.port}');
