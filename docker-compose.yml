@@ -7,7 +7,7 @@ services:
             DB_PORT: ${DB_PORT}
         image: dartrinha
         ports:
-            - "8080:8080"
+            - "${SERVER_PORT}:${SERVER_PORT}"
         depends_on: 
             - db
         networks:
@@ -22,7 +22,7 @@ services:
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
         ports:
-            - '3306:3306'
+            - '${DB_PORT}:${DB_PORT}'
         volumes:
             - my-db:/var/lib/mysql
         networks:
