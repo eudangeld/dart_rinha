@@ -5,7 +5,7 @@ class Pessoa {
   String apelido;
   String nome;
   String nascimento;
-  List<dynamic> stack;
+  dynamic stack;
   Pessoa({
     required this.apelido,
     required this.nome,

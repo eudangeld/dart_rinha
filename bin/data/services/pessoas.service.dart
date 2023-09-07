@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../../domain/enitite/pessoa.entity.dart';
 import '../../mysql_lib/mysql_client.dart';
 import '../../uuid/uuid.dart';
@@ -22,7 +24,7 @@ class PessoasSevice {
         nome: userData['nome']!,
         apelido: userData['apelido']!,
         nascimento: userData['nascimento']!,
-        stack: [],
+        stack: jsonDecode(userData['stack']!),
       );
     }
 
@@ -39,7 +41,7 @@ class PessoasSevice {
       'nome': pessoa.nome,
       'apelido': pessoa.apelido,
       'nascimento': pessoa.nascimento,
-      'stack': pessoa.stack,
+      'stack': jsonEncode(pessoa.stack),
       'serchable': pessoa.toString(),
     });
 
@@ -72,12 +74,6 @@ class PessoasSevice {
         ));
       }
     }
-
-    print('response.length');
-    print(response.length);
-
     return response;
   }
 }
-
-final Map<String, Pessoa> db = {};
