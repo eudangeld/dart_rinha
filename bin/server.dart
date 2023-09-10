@@ -22,8 +22,9 @@ void main() async {
 }
 
 Future<HttpServer> createServer() async {
-  final db = await database();
-  final pessoasService = PessoasSevice(db);
+  final dbConnection = await databaseConnection();
+  final Database database = Database(dbConnection);
+  final pessoasService = PessoasSevice(database);
   final pessoasController = PessoasController(pessoasService);
 
   Map<String, dynamic> env = Platform.environment;
@@ -34,33 +35,23 @@ Future<HttpServer> createServer() async {
     return Response.ok('done');
   });
 
-  router.get('/pessoas/<id>', (Request request, String id) {
-    print('Calling');
-    return pessoasController.find(id);
-  });
+  router.get('/pessoas/<id>',
+      (Request request, String id) => pessoasController.find(id));
 
-  router.get('/pessoas', (Request request) {
-    print('Calling');
-    return pessoasController.filter(request);
-  });
+  router.get(
+      '/pessoas', (Request request) => pessoasController.filter(request));
 
-  router.get('/contagem-pessoas', (Request request) {
-    print('Calling');
-    return pessoasController.count();
-  });
+  router.get(
+      '/contagem-pessoas', (Request request) => pessoasController.count());
 
-  router.post('/pessoas/', (Request request) {
-    print('Calling');
-    return pessoasController.create(request);
-  });
+  router.post(
+      '/pessoas/', (Request request) => pessoasController.create(request));
 
   final serverPort = int.tryParse(env["SERVER_PORT"]);
-
   var server =
       await shelf_io.serve(router, InternetAddress.anyIPv4, serverPort!);
   server.autoCompress = true;
 
   print('Serving at http://${server.address.host}:${server.port}');
-
   return server;
 }

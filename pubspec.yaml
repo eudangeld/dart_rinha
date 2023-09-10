@@ -11,6 +11,7 @@ dependencies:
   shelf_router: ^1.1.0
   shelf_static: ^1.1.0
   uuid: ^4.0.0
+  shelf_hotreload: ^1.4.0
 
 dev_dependencies:
   http: ^1.1.0

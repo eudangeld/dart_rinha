@@ -1,0 +1,39 @@
+config:
+  # This is a test server run by team Artillery
+  # It's designed to be highly scalable
+  target: http://localhost:9999
+  phases:
+    - duration: 10
+      arrivalRate: 1
+      rampTo: 5
+      name: Warm up phase
+    - duration: 60
+      arrivalRate: 50
+      rampTo: 100
+      name: Ramp up load
+    - duration: 30
+      arrivalRate: 100
+      rampTo: 500
+      name: Spike phase
+  # Load & configure a couple of useful plugins
+  # https://docs.art/reference/extensions
+  plugins:
+    ensure: {}
+    apdex: {}
+    metrics-by-endpoint: {}
+  apdex:
+    threshold: 100
+  ensure:
+    thresholds:
+      - http.response_time.p99: 100
+      - http.response_time.p95: 75
+scenarios:
+  - flow:
+      - post:
+          url: "/pessoas/"
+          json:
+            apelido: "asd"
+            nome: "artillary"
+            nascimento: "1985-09-23"
+            stack: ["node", "python"]
+count: 100
