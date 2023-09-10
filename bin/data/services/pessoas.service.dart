@@ -20,7 +20,6 @@ class PessoasSevice {
   }
 
   Future<String> create(Pessoa pessoa) async {
-    final uuid = Uuid();
     pessoa.id = uuid.v1();
     return await database.create(pessoa);
   }
