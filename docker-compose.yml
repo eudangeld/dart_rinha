@@ -1,10 +1,12 @@
 version: '3.7'
 services:
-    dart-server:
+    api1:
         restart: always
+        container_name: 'API_NODE_001'
         environment:
             DB_HOST: ${DB_HOST}
             DB_PORT: ${DB_PORT}
+            SERVER_PORT: 8080
         image: dartrinha
         ports:
             - "${SERVER_PORT}:${SERVER_PORT}"
@@ -12,7 +14,49 @@ services:
             - db
         networks:
         - localhost
-        
+    api2:
+        restart: always
+        container_name: 'API_NODE_002'
+        environment:
+            DB_HOST: ${DB_HOST}
+            DB_PORT: ${DB_PORT}
+            SERVER_PORT: 8081
+        image: dartrinha
+        ports:
+            - "8081:8081"
+        depends_on: 
+            - db
+        networks:
+        - localhost
+    nginx: # Load Balancer
+        image: nginx:latest
+        volumes:
+        - ./nginx.conf:/etc/nginx/nginx.conf:ro
+        depends_on:
+        - api1
+        # - api2
+        ports:
+        - "9999:9999"
+        # deploy:
+        #     resources:
+        #         limits:
+        #             cpus: '0.25'
+        #             memory: '0.5GB'
+    # redis: # Load Balancer
+        # image: redis:latest
+        # volumes:
+        # - ./nginx.conf:/etc/nginx/nginx.conf:ro
+        # depends_on:
+        # - db
+        # - api2
+        # ports:
+        # - "6379:6379"
+        # deploy:
+        #     resources:
+        #         limits:
+        #             cpus: '0.25'
+        #             memory: '0.5GB'
+            
     db:
         image: mysql:latest
         restart: always
@@ -25,6 +69,7 @@ services:
             - '${DB_PORT}:${DB_PORT}'
         volumes:
             - my-db:/var/lib/mysql
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         networks:
         - localhost
 volumes:
