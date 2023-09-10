@@ -9,31 +9,58 @@ import 'application/controllers/pessoas.controller.dart';
 import 'data/config/connection.dart';
 import 'data/services/pessoas.service.dart';
 import 'router_lib/src/router.dart';
+import 'package:shelf_hotreload/shelf_hotreload.dart';
 
 void main() async {
+  withHotreload(
+    createServer,
+    onReloaded: () => print('Restarting application!'),
+    onHotReloadNotAvailable: () => print('No hot-reload :('),
+    onHotReloadAvailable: () => print('Started with live reload'),
+    logLevel: Level.INFO,
+  );
+}
+
+Future<HttpServer> createServer() async {
   final db = await database();
   final pessoasService = PessoasSevice(db);
   final pessoasController = PessoasController(pessoasService);
 
+  Map<String, dynamic> env = Platform.environment;
+
   final router = Router();
-  router.get('/health', (Request request) => Response.ok('done'));
-  router.get('/pessoas/<id>',
-      (Request request, String id) => pessoasController.find(id));
 
-  router.get('/pessoas', (Request request) async {
-    final resp = await pessoasController.filter(request);
-
-    return resp;
+  router.get('/health', (Request request) {
+    return Response.ok('done');
   });
 
-  router.get(
-      '/contagem-pessoas', (Request request) => pessoasController.count());
+  router.get('/pessoas/<id>', (Request request, String id) {
+    print('Calling');
+    return pessoasController.find(id);
+  });
 
-  router.post(
-      '/pessoas/', (Request request) => pessoasController.create(request));
+  router.get('/pessoas', (Request request) {
+    print('Calling');
+    return pessoasController.filter(request);
+  });
 
-  var server = await shelf_io.serve(router, InternetAddress.anyIPv4, 8080);
+  router.get('/contagem-pessoas', (Request request) {
+    print('Calling');
+    return pessoasController.count();
+  });
+
+  router.post('/pessoas/', (Request request) {
+    print('Calling');
+    return pessoasController.create(request);
+  });
+
+  final serverPort = int.tryParse(env["SERVER_PORT"]);
+
+  var server =
+      await shelf_io.serve(router, InternetAddress.anyIPv4, serverPort!);
   server.autoCompress = true;
 
   print('Serving at http://${server.address.host}:${server.port}');
+
+  return server;
 }
