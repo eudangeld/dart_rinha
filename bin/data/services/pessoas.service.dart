@@ -1,13 +1,20 @@
+import 'package:redis/redis.dart';
+
 import '../../domain/enitite/pessoa.entity.dart';
 import '../../uuid/uuid.dart';
-import '../config/connection.dart';
+import '../../infra/mysql/database.dart';
 
 class PessoasSevice {
-  PessoasSevice(this.database) {
+  PessoasSevice(
+    this.database,
+    this.redis,
+  ) {
     database.tableName = 'pessoas';
   }
 
+  
   final Database database;
+  final Command redis;
 
   final uuid = Uuid();
 
@@ -21,7 +28,9 @@ class PessoasSevice {
 
   Future<String> create(Pessoa pessoa) async {
     pessoa.id = uuid.v1();
-    return await database.create(pessoa);
+    redis.set(pessoa.id.toString(), pessoa.toJson());
+    // await database.create(pessoa);
+    return pessoa.id!;
   }
 
   Future<int> count() async => await database.count();
