@@ -8,12 +8,6 @@
 - `docker compose run`
 - localhost:9999
 
-### Locally
-
-- `docker compose db`
-- `docker compose redis`
-- use nodemon `nodemon bin/server.dart`
-
 ### Load test
 
 - `npm install -g artillery@latest`
