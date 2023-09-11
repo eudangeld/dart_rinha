@@ -6,25 +6,27 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
 import 'application/controllers/pessoas.controller.dart';
-import 'data/config/connection.dart';
+import 'infra/mysql/database.dart';
 import 'data/services/pessoas.service.dart';
+import 'infra/redis/redis.dart';
 import 'router_lib/src/router.dart';
-import 'package:shelf_hotreload/shelf_hotreload.dart';
 
 void main() async {
-  withHotreload(
-    createServer,
-    onReloaded: () => print('Restarting application!'),
-    onHotReloadNotAvailable: () => print('No hot-reload :('),
-    onHotReloadAvailable: () => print('Started with live reload'),
-    logLevel: Level.INFO,
-  );
+  await createServer();
+  // withHotreload(
+  //   createServer(),
+  //   onReloaded: () => print('Restarting application!'),
+  //   onHotReloadNotAvailable: () => print('No hot-reload :('),
+  //   onHotReloadAvailable: () => print('Started with live reload'),
+  //   logLevel: Level.INFO,
+  // );
 }
 
 Future<HttpServer> createServer() async {
   final dbConnection = await databaseConnection();
+  final reddisConnection = await redisConnect();
   final Database database = Database(dbConnection);
-  final pessoasService = PessoasSevice(database);
+  final pessoasService = PessoasSevice(database, reddisConnection);
   final pessoasController = PessoasController(pessoasService);
 
   Map<String, dynamic> env = Platform.environment;
