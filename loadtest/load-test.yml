@@ -3,17 +3,9 @@ config:
   # It's designed to be highly scalable
   target: http://localhost:9999
   phases:
-    - duration: 10
-      arrivalRate: 1
-      rampTo: 5
-      name: Warm up phase
-    - duration: 60
-      arrivalRate: 50
-      rampTo: 100
-      name: Ramp up load
-    - duration: 30
+    - duration: 5
       arrivalRate: 100
-      rampTo: 500
+      rampTo: 10000
       name: Spike phase
   # Load & configure a couple of useful plugins
   # https://docs.art/reference/extensions
@@ -36,4 +28,3 @@ scenarios:
             nome: "artillary"
             nascimento: "1985-09-23"
             stack: ["node", "python"]
-count: 100
